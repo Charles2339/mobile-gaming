@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MK-MOBILE-GAMING</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:         #080C10;
+            --surface:    #0D1520;
+            --surface2:   #111B2A;
+            --border:     #1E3A5F;
+            --cyan:       #00D4FF;
+            --cyan-dim:   #00A8CC;
+            --cyan-glow:  rgba(0,212,255,0.18);
+            --cyan-glow2: rgba(0,212,255,0.06);
+            --text:       #E8F4F8;
+            --text-dim:   #7A9BB5;
+            --text-muted: #3A5A78;
+            --red:        #FF3860;
+            --green:      #00FF88;
+            --yellow:     #FFD700;
+            --purple:     #B829DD;
+            --purple-glow: rgba(184,41,221,0.18);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            color: var(--text);
+            padding-bottom: 80px;
+            position: relative;
+            overflow-x: hidden;
+            background-color: var(--bg);
+        }
+
+        #bg-overlay {
+            position: fixed; inset: 0; z-index: 1;
+            background: linear-gradient(160deg, rgba(8,12,16,0.92) 0%, rgba(8,12,16,0.85) 50%, rgba(8,12,16,0.95) 100%);
+        }
+        body::before {
+            content: ''; position: fixed; inset: 0; z-index: 2; pointer-events: none;
+            background: repeating-linear-gradient(to bottom, transparent 0px, transparent 3px, rgba(0,0,0,0.07) 3px, rgba(0,0,0,0.07) 4px);
+        }
+        body::after {
+            content: ''; position: fixed; width: 600px; height: 600px;
+            top: -200px; left: -200px; z-index: 2; pointer-events: none;
+            background: radial-gradient(circle, rgba(0,212,255,0.05) 0%, transparent 70%);
+            animation: drift 12s ease-in-out infinite alternate;
+        }
+        @keyframes drift { 0% { transform: translate(0,0); } 100% { transform: translate(80px,60px); } }
+
+        .container { max-width: 900px; margin: 0 auto; padding: 20px 16px; position: relative; z-index: 10; }
+
+        header {
+            text-align: center; padding: 32px 24px 24px;
+            background: rgba(13,21,32,0.85); backdrop-filter: blur(16px);
+            border-radius: 4px; margin-bottom: 16px;
+            border: 1px solid var(--border); border-top: 2px solid var(--cyan);
+            position: relative; overflow: hidden;
+        }
+        header::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+            animation: scan-line 3s ease-in-out infinite;
+        }
+        @keyframes scan-line { 0%,100% { opacity:.4; } 50% { opacity:1; } }
+        .header-tag { font-family:'JetBrains Mono',monospace; font-size:.68rem; color:var(--text-muted); letter-spacing:3px; text-transform:uppercase; margin-bottom:10px; }
+        .header-tag span { color:var(--cyan); }
+        h1 {
+            font-family:'JetBrains Mono',monospace; font-size:2.2rem; font-weight:700;
+            letter-spacing:8px; color:var(--text);
+            text-shadow: 0 0 10px var(--cyan), 0 0 30px var(--cyan-glow), 0 0 60px rgba(0,212,255,0.08);
+            animation: glitch 6s ease-in-out infinite; position:relative;
+        }
+        h1::before, h1::after { content:attr(data-text); position:absolute; left:0; top:0; width:100%; height:100%; opacity:0; }
+        h1::before { color:var(--red); clip-path:inset(30% 0 50% 0); animation:glitch-top 6s ease-in-out infinite; }
+        h1::after  { color:var(--cyan); clip-path:inset(50% 0 20% 0); animation:glitch-bot 6s ease-in-out infinite; }
+        @keyframes glitch    { 0%,90%,100%{transform:none;} 92%{transform:skewX(-1deg);} 94%{transform:skewX(1deg);} 96%{transform:none;} }
+        @keyframes glitch-top{ 0%,90%,100%{opacity:0;transform:none;} 92%{opacity:.6;transform:translate(-2px,0);} 94%{opacity:0;} }
+        @keyframes glitch-bot{ 0%,91%,100%{opacity:0;transform:none;} 93%{opacity:.5;transform:translate(2px,0);}  95%{opacity:0;} }
+        .subtitle { font-family:'JetBrains Mono',monospace; font-size:.8rem; color:var(--cyan); letter-spacing:4px; text-transform:uppercase; margin-top:8px; opacity:.85; }
+        .header-stats { display:flex; justify-content:center; gap:32px; margin-top:16px; padding-top:14px; border-top:1px solid var(--border); }
+        .stat { font-family:'JetBrains Mono',monospace; font-size:.68rem; color:var(--text-muted); text-align:center; }
+        .stat-val { display:block; font-size:1.1rem; font-weight:600; color:var(--cyan); margin-bottom:2px; }
+
+        .settings-toggle {
+            position: fixed; top: 16px; right: 16px; z-index: 1000;
+            background: rgba(13,21,32,0.9); border: 1px solid var(--border);
+            border-radius: 4px; padding: 8px 12px; cursor: pointer;
+            font-family: 'JetBrains Mono', monospace; font-size: .65rem;
+            color: var(--text-muted); letter-spacing: 1px;
+            transition: all .2s;
+        }
+        .settings-toggle:hover { color: var(--cyan); border-color: var(--cyan); }
+
+        .search-container { position:relative; margin-bottom:16px; }
+        .search-input {
+            width:100%; padding:13px 18px 13px 46px;
+            background:var(--surface); border:1px solid var(--border); border-radius:4px;
+            color:var(--text); font-family:'JetBrains Mono',monospace; font-size:.88rem;
+            outline:none; transition:all .25s ease; letter-spacing:.5px;
+        }
+        .search-input::placeholder { color:var(--text-muted); }
+        .search-input:focus { border-color:var(--cyan); box-shadow:0 0 0 1px var(--cyan),0 0 20px var(--cyan-glow); background:var(--surface2); }
+        .search-icon { position:absolute; left:15px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:1.1rem; pointer-events:none; transition:color .25s; }
+        .search-container:focus-within .search-icon { color:var(--cyan); }
+
+        .game-count {
+            font-family:'JetBrains Mono',monospace; font-size:.7rem; color:var(--text-muted);
+            letter-spacing:2px; text-transform:uppercase; margin-bottom:14px; padding:0 4px;
+            display:flex; align-items:center; gap:8px;
+        }
+        .game-count::before { content:''; display:inline-block; width:20px; height:1px; background:var(--border); }
+
+        .games-list { display:flex; flex-direction:column; gap:16px; }
+        
+        .game-card {
+            background:rgba(13,21,32,0.80); backdrop-filter:blur(10px);
+            border:1px solid var(--border); border-radius:4px;
+            overflow:hidden; transition:border-color .2s, box-shadow .2s;
+            position: relative;
+        }
+        .game-card:hover { border-color:rgba(0,212,255,0.4); box-shadow:0 0 20px var(--cyan-glow2); }
+
+        /* Admin delete button */
+        .game-delete-btn {
+            position: absolute; top: 8px; right: 8px; z-index: 10;
+            width: 28px; height: 28px; border-radius: 4px;
+            background: rgba(255,56,96,0.15); border: 1px solid rgba(255,56,96,0.3);
+            color: var(--red); cursor: pointer; display: none;
+            align-items: center; justify-content: center;
+            font-family: 'JetBrains Mono', monospace; font-size: .9rem;
+            transition: all .2s;
+        }
+        .game-card:hover .game-delete-btn { display: flex; }
+        .game-delete-btn:hover { background: var(--red); color: var(--bg); }
+
+        /* ── SCREENSHOT GALLERY ─────────────────────────────────────── */
+        .screenshot-gallery {
+            position: relative; width: 100%; height: 220px;
+            background: var(--surface); overflow: hidden;
+        }
+        .screenshot-track {
+            display: flex; height: 100%;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: grab;
+        }
+        .screenshot-track:active { cursor: grabbing; }
+        .screenshot-slide {
+            min-width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--surface2);
+            position: relative;
+        }
+        .screenshot-slide img {
+            max-width: 100%; max-height: 100%;
+            object-fit: contain; pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+        .screenshot-dots {
+            position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 6px; z-index: 5;
+        }
+        .screenshot-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--text-muted); opacity: 0.5;
+            transition: all .2s; cursor: pointer;
+        }
+        .screenshot-dot.active { background: var(--cyan); opacity: 1; box-shadow: 0 0 6px var(--cyan); }
+        
+        .screenshot-nav {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: rgba(8,12,16,0.7); border: 1px solid var(--border);
+            color: var(--text); width: 36px; height: 36px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 4px; cursor: pointer; z-index: 5;
+            font-size: 1.2rem; opacity: 0; transition: opacity .25s, background .2s, border-color .2s;
+        }
+        .screenshot-gallery:hover .screenshot-nav { opacity: 1; }
+        .screenshot-nav:hover { background: var(--cyan); color: var(--bg); border-color: var(--cyan); }
+        .screenshot-nav.prev { left: 10px; }
+        .screenshot-nav.next { right: 10px; }
+        .screenshot-counter {
+            position: absolute; bottom: 10px; right: 12px;
+            background: rgba(8,12,16,0.7); border: 1px solid var(--border);
+            border-radius: 4px; padding: 3px 8px;
+            font-family: 'JetBrains Mono', monospace; font-size: .6rem;
+            color: var(--text-muted); z-index: 5;
+        }
+
+        .game-info { padding: 14px 16px; }
+        .game-title { font-size:1.05rem; font-weight:600; color:var(--text); margin-bottom:4px; }
+        .game-meta { font-family:'JetBrains Mono',monospace; font-size:.65rem; color:var(--text-muted); letter-spacing:1px; margin-bottom:10px; }
+        .game-desc { font-size:.82rem; color:var(--text-dim); line-height:1.5; margin-bottom:12px; }
+
+        .game-actions { display:flex; gap:8px; }
+        .btn {
+            padding:8px 16px; border:none; border-radius:3px; cursor:pointer;
+            font-family:'JetBrains Mono',monospace; font-size:.75rem; font-weight:600;
+            letter-spacing:1px; transition:all .2s ease; display:flex; align-items:center;
+            gap:6px; text-decoration:none; white-space:nowrap;
+        }
+        .btn-download { background:transparent; color:var(--cyan); border:1px solid var(--cyan); flex:1; justify-content:center; }
+        .btn-download:hover { background:var(--cyan); color:var(--bg); box-shadow:0 0 20px var(--cyan-glow); }
+        .btn-download svg { width:14px; height:14px; flex-shrink:0; }
+
+        /* ── SETTINGS MODAL ─────────────────────────────────────────── */
+        .overlay {
+            position: fixed; inset: 0; background: rgba(8,12,16,0.7);
+            display: none; align-items: center; justify-content: center;
+            z-index: 2000; backdrop-filter: blur(8px);
+        }
+        .overlay.open { display: flex; }
+        .modal {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 8px; width: 92%; max-width: 420px;
+            max-height: 90vh; overflow-y: auto;
+            box-shadow: 0 24px 64px rgba(0,212,255,0.08);
+            animation: modalIn 0.2s ease;
+        }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.96) translateY(8px); } to { opacity: 1; transform: none; } }
+        .modal-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 18px 20px 14px; border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; background: var(--surface); z-index: 1;
+        }
+        .modal-header h3 {
+            font-family: 'JetBrains Mono', monospace; font-size: .85rem;
+            color: var(--cyan); letter-spacing: 2px; text-transform: uppercase;
+        }
+        .modal-close {
+            width: 28px; height: 28px; border-radius: 6px;
+            border: none; background: none; color: var(--text-muted);
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: background 0.12s, color 0.12s;
+        }
+        .modal-close:hover { background: var(--surface2); color: var(--text); }
+        .modal-body { padding: 20px; display: flex; flex-direction: column; gap: 18px; }
+
+        .admin-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 3px 10px; border-radius: 20px; font-size: .65rem; font-weight: 600;
+        }
+        .admin-badge.disabled { background: rgba(255,56,96,0.1); color: var(--red); border: 1px solid rgba(255,56,96,0.2); }
+        .admin-badge.active { background: rgba(0,255,136,0.1); color: var(--green); border: 1px solid rgba(0,255,136,0.2); }
+        
+        .admin-btn {
+            width: 100%; padding: 12px;
+            background: var(--cyan-glow); border: 1px solid var(--cyan);
+            border-radius: 4px; color: var(--cyan); font-family: 'JetBrains Mono', monospace;
+            font-size: .8rem; font-weight: 600; letter-spacing: 1px; cursor: pointer;
+            transition: all .15s; text-transform: uppercase;
+        }
+        .admin-btn:hover { background: var(--cyan); color: var(--bg); }
+        .admin-btn-sm {
+            padding: 8px 16px; background: var(--cyan); border: none; border-radius: 4px;
+            color: var(--bg); font-family: 'JetBrains Mono', monospace; font-size: .75rem;
+            font-weight: 600; cursor: pointer; transition: opacity .15s; flex-shrink: 0;
+        }
+        .admin-btn-sm:hover { opacity: .85; }
+        .admin-btn-danger {
+            padding: 8px 16px; background: rgba(255,56,96,0.1); border: 1px solid rgba(255,56,96,0.3);
+            border-radius: 4px; color: var(--red); font-size: .75rem; font-family: 'JetBrains Mono', monospace;
+            cursor: pointer; transition: background .15s; width: 100%; text-transform: uppercase;
+            font-weight: 600; letter-spacing: 1px;
+        }
+        .admin-btn-danger:hover { background: rgba(255,56,96,0.2); }
+        .admin-input-row { display: flex; gap: 8px; margin-top: 8px; }
+        .admin-input {
+            flex: 1; background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 4px; padding: 10px 12px; color: var(--text);
+            font-family: 'Inter', sans-serif; font-size: .85rem; outline: none;
+            transition: border-color .2s;
+        }
+        .admin-input:focus { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan); }
+        .admin-active-row {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 10px; padding: 10px 12px; background: rgba(0,255,136,0.06);
+            border: 1px solid rgba(0,255,136,0.15); border-radius: 6px;
+            font-size: .8rem; color: var(--text); margin-bottom: 12px;
+        }
+
+        /* ── POST PANEL (Admin Only) ────────────────────────────────── */
+        .post-panel {
+            display: none;
+            background: rgba(13,21,32,0.95); backdrop-filter: blur(20px);
+            border: 1px solid var(--border); border-radius: 4px;
+            padding: 20px; margin-bottom: 16px;
+            animation: fadeIn 0.3s ease;
+        }
+        .post-panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+        .post-panel h3 {
+            font-family: 'JetBrains Mono', monospace; font-size: .9rem;
+            color: var(--cyan); letter-spacing: 2px; text-transform: uppercase;
+            margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border);
+        }
+        .post-field { margin-bottom: 14px; }
+        .post-field label {
+            display: block; font-family: 'JetBrains Mono', monospace;
+            font-size: .65rem; color: var(--text-muted);
+            letter-spacing: 1px; text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+        .post-field input, .post-field textarea, .post-field select {
+            width: 100%; padding: 10px 12px;
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 3px; color: var(--text);
+            font-family: 'Inter', sans-serif; font-size: .85rem;
+            outline: none; transition: all .2s;
+        }
+        .post-field input:focus, .post-field textarea:focus, .post-field select:focus {
+            border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan);
+        }
+        .post-field textarea { min-height: 80px; resize: vertical; }
+        .post-field select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' viewBox='0 0 24 24'%3E%3Cpath stroke='%233A5A78' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 12px center;
+            padding-right: 32px;
+        }
+        .post-field select option { background: var(--surface2); color: var(--text); }
+        .post-field .desc {
+            font-size: .7rem; color: var(--text-muted); margin-top: 4px;
+        }
+        
+        .screenshot-upload {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        .screenshot-upload .screenshot-preview {
+            width: 80px; height: 80px; border: 1px dashed var(--border);
+            border-radius: 3px; display: flex; align-items: center;
+            justify-content: center; color: var(--text-muted);
+            font-size: 1.5rem; cursor: pointer; transition: all .2s;
+            position: relative; overflow: hidden;
+        }
+        .screenshot-upload .screenshot-preview:hover {
+            border-color: var(--cyan); color: var(--cyan);
+        }
+        .screenshot-upload .screenshot-preview img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .screenshot-upload .screenshot-preview .remove {
+            position: absolute; top: 2px; right: 2px;
+            background: var(--red); color: var(--bg);
+            width: 18px; height: 18px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: .7rem; cursor: pointer; opacity: 0; transition: opacity .2s;
+        }
+        .screenshot-upload .screenshot-preview:hover .remove { opacity: 1; }
+
+        .btn-post {
+            width: 100%; padding: 12px;
+            background: var(--cyan); color: var(--bg);
+            border: none; border-radius: 3px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .8rem; font-weight: 600;
+            letter-spacing: 2px; text-transform: uppercase;
+            cursor: pointer; transition: all .2s;
+        }
+        .btn-post:hover {
+            background: var(--cyan-dim);
+            box-shadow: 0 0 20px var(--cyan-glow);
+        }
+        .btn-post:disabled {
+            opacity: 0.5; cursor: not-allowed;
+        }
+
+        .loading { text-align:center; padding:50px 20px; color:var(--text-muted); font-family:'JetBrains Mono',monospace; font-size:.8rem; letter-spacing:1px; }
+        .spinner { display:inline-block; width:28px; height:28px; border:1px solid var(--border); border-top-color:var(--cyan); border-radius:50%; animation:spin .9s linear infinite; margin-bottom:14px; box-shadow:0 0 10px var(--cyan-glow); }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .empty-state { text-align:center; padding:50px 20px; font-family:'JetBrains Mono',monospace; color:var(--text-muted); font-size:.8rem; }
+        .empty-state-icon { font-size:2.5rem; margin-bottom:14px; opacity:.4; }
+        .empty-state h3 { color:var(--text-dim); margin-bottom:8px; font-size:.9rem; }
+
+        .site-footer {
+            text-align: center; padding: 24px 16px;
+            font-family: 'JetBrains Mono', monospace; font-size: .65rem;
+            color: var(--text-muted); letter-spacing: 2px;
+            text-transform: uppercase; border-top: 1px solid var(--border);
+            margin-top: 24px; position: relative; z-index: 10;
+        }
+        .site-footer span { color: var(--cyan); opacity: .7; }
+
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 6px; padding: 10px 18px;
+            font-family: 'JetBrains Mono', monospace; font-size: .75rem;
+            color: var(--text); z-index: 3000;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            opacity: 0; transition: opacity 0.25s; pointer-events: none;
+            max-width: 90vw; text-align: center;
+        }
+        .toast.show { opacity: 1; }
+        .toast.error { border-color: var(--red); color: var(--red); }
+        .toast.success { border-color: var(--green); color: var(--green); }
+
+        /* ── PLATFORM TABS ───────────────────────────────────────────── */
+        .platform-tabs {
+            display: flex; gap: 8px; margin-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+        }
+        .platform-tab {
+            padding: 8px 18px; border-radius: 4px;
+            background: var(--surface); border: 1px solid var(--border);
+            color: var(--text-muted); font-family: 'JetBrains Mono', monospace;
+            font-size: .7rem; font-weight: 600; letter-spacing: 1px;
+            text-transform: uppercase; cursor: pointer; transition: all .2s;
+            flex: 1; text-align: center;
+        }
+        .platform-tab:hover { border-color: var(--cyan); color: var(--cyan); }
+        .platform-tab.active {
+            background: var(--cyan-glow); border-color: var(--cyan);
+            color: var(--cyan); box-shadow: 0 0 12px var(--cyan-glow2);
+        }
+
+        @media (max-width:640px) {
+            h1 { font-size:1.6rem; letter-spacing:4px; }
+            .header-stats { gap:14px; flex-wrap:wrap; justify-content:center; }
+            .btn { padding:7px 12px; font-size:.7rem; }
+            .screenshot-gallery { height: 180px; }
+            .modal { width: 96%; }
+            .platform-tab { padding: 7px 10px; font-size: .6rem; }
+        }
+        @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important; } }
+    </style>
+</head>
+<body>
+    <div id="bg-overlay"></div>
+
+    <button class="settings-toggle" id="settingsToggle" onclick="openSettings()">⚙ SETTINGS</button>
+
+    <div class="container">
+        <header>
+            <div class="header-tag">[ <span>sys://mkdev.games</span> ] — initialized</div>
+            <h1 data-text="MK-MOBILE-GAMING">MK-MOBILE-GAMING</h1>
+            <p class="subtitle">Android · Emulator</p>
+            <div class="header-stats">
+                <div class="stat"><span class="stat-val" id="statTotal">—</span>games loaded</div>
+                <div class="stat"><span class="stat-val" id="statNow">—</span>available</div>
+            </div>
+        </header>
+
+        <!-- Post Panel (Admin Only) -->
+        <div class="post-panel" id="postPanel">
+            <h3>⚡ Post New Game</h3>
+            <div class="post-field">
+                <label>Game Name *</label>
+                <input type="text" id="postName" placeholder="e.g., Celeste Classic">
+            </div>
+            <div class="post-field">
+                <label>Platform *</label>
+                <select id="postPlatform" onchange="onPlatformChange()">
+                    <option value="android">Android</option>
+                    <option value="emulator">Emulator</option>
+                </select>
+            </div>
+            <div class="post-field" id="emulatorField" style="display:none">
+                <label>Emulator Name *</label>
+                <input type="text" id="postEmulator" placeholder="e.g., PPSSPP, Dolphin, Citra">
+                <p class="desc">Required when platform is Emulator</p>
+            </div>
+            <div class="post-field">
+                <label>Description</label>
+                <textarea id="postDesc" placeholder="Short description of the game..."></textarea>
+            </div>
+            <div class="post-field">
+                <label>Download Link (MEGA, MediaFire, etc.) *</label>
+                <input type="url" id="postLink" placeholder="https://mega.nz/file/...">
+            </div>
+            <div class="post-field">
+                <label>Screenshots (1-5 images, click + to add)</label>
+                <div class="screenshot-upload" id="screenshotUpload">
+                    <div class="screenshot-preview" onclick="document.getElementById('screenshotInput').click()">
+                        <span>+</span>
+                    </div>
+                </div>
+                <input type="file" id="screenshotInput" accept="image/*" multiple style="display:none" onchange="handleScreenshots(this)">
+            </div>
+            <button class="btn-post" id="postBtn" onclick="postGame()">POST</button>
+            <div id="postStatus" style="margin-top:10px;font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--text-muted);"></div>
+        </div>
+
+        <div class="search-container">
+            <span class="search-icon">⌕</span>
+            <input type="text" class="search-input" id="searchInput" placeholder="search games...">
+        </div>
+
+        <!-- Platform Filter Tabs -->
+        <div class="platform-tabs" id="platformTabs">
+            <div class="platform-tab active" data-platform="android" onclick="filterPlatform('android')">Android</div>
+            <div class="platform-tab" data-platform="emulator" onclick="filterPlatform('emulator')">Emulator</div>
+        </div>
+
+        <div class="game-count" id="gameCount">scanning archive...</div>
+
+        <div class="games-list" id="gamesList">
+            <div class="loading"><div class="spinner"></div><p>loading game matrix...</p></div>
+        </div>
+
+        <footer class="site-footer"><span>©2026 MKDEV</span></footer>
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div class="overlay" id="settingsOverlay" onclick="overlayClick(event)">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>⚙ Settings</h3>
+                <button class="modal-close" onclick="closeSettings()">
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-group admin-section">
+                    <label>Admin Mode &nbsp;<span class="admin-badge disabled" id="adminBadge">Disabled</span></label>
+                    <div id="adminStep0">
+                        <button class="admin-btn" onclick="adminShowPass()">🔐 Enable Admin Mode</button>
+                    </div>
+                    <div id="adminStep1" style="display:none">
+                        <p style="font-size:.8rem;color:var(--text-dim);margin-bottom:8px">Enter the admin password:</p>
+                        <div class="admin-input-row">
+                            <input type="password" id="adminPassInput" class="admin-input" placeholder="Password..." onkeydown="if(event.key==='Enter')adminVerifyPass()">
+                            <button class="admin-btn-sm" onclick="adminVerifyPass()">Unlock</button>
+                        </div>
+                        <p id="adminPassErr" style="color:var(--red);font-size:.75rem;display:none;margin-top:6px">❌ Wrong password.</p>
+                    </div>
+                    <div id="adminStep2" style="display:none">
+                        <p style="font-size:.8rem;color:var(--text-dim);margin-bottom:8px">Paste your GitHub Personal Access Token:</p>
+                        <div class="admin-input-row">
+                            <input type="password" id="adminTokenInput" class="admin-input" placeholder="ghp_... or github_pat_..." onkeydown="if(event.key==='Enter')adminSaveToken()">
+                            <button class="admin-btn-sm" onclick="adminSaveToken()">Save</button>
+                        </div>
+                    </div>
+                    <div id="adminStep3" style="display:none">
+                        <div class="admin-active-row">
+                            <span>🔓 Admin mode active</span>
+                        </div>
+                        <button class="admin-btn-danger" onclick="adminDisable()">Disable Admin Mode</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+    // ═══════════════════════════════════════════════════════════════════
+    //  MK-MOBILE-GAMING — FIXED VERSION
+    //  Bugs fixed:
+    //  1. Delete used wrong index (filtered vs original array)
+    //  2. Upload had no unique game ID, causing overwrites
+    //  3. Upload didn't re-fetch SHA before final commit, causing 409s
+    // ═══════════════════════════════════════════════════════════════════
+
+    const DEFAULT_CONFIG = {
+        owner: 'Charles2339',
+        repo:  'mobile-gaming',
+        branch: 'main',
+        gamesJson: 'games.json'
+    };
+
+    const ADMIN_PASS = 'bane12!!!?';
+
+    let games = [];
+    let adminScreenshots = [];
+    let currentPlatform = 'android';
+
+    const searchInput = document.getElementById('searchInput');
+    const gamesList   = document.getElementById('gamesList');
+    const gameCount   = document.getElementById('gameCount');
+    const statTotal   = document.getElementById('statTotal');
+    const statNow     = document.getElementById('statNow');
+    const postPanel   = document.getElementById('postPanel');
+    const settingsToggle = document.getElementById('settingsToggle');
+
+    // ── CONFIG HELPERS ───────────────────────────────────────────────
+    function getConfig() {
+        const repo = localStorage.getItem('mkg_repo') || `${DEFAULT_CONFIG.owner}/${DEFAULT_CONFIG.repo}`;
+        const parts = repo.split('/');
+        return {
+            owner: parts[0] || DEFAULT_CONFIG.owner,
+            repo: parts[1] || DEFAULT_CONFIG.repo,
+            branch: localStorage.getItem('mkg_branch') || DEFAULT_CONFIG.branch,
+            gamesJson: DEFAULT_CONFIG.gamesJson
+        };
+    }
+
+    // ── LOAD GAMES ───────────────────────────────────────────────────
+    async function loadGames() {
+        const cfg = getConfig();
+        try {
+            const url = `https://raw.githubusercontent.com/${cfg.owner}/${cfg.repo}/${cfg.branch}/${cfg.gamesJson}?t=${Date.now()}`;
+            const res = await fetch(url, { cache: 'no-store' });
+            if (!res.ok) throw new Error('No games.json yet');
+            games = await res.json();
+            // Ensure every game has an id (for backward compat)
+            games.forEach((g, i) => {
+                if (!g.id) g.id = `game_${Date.now()}_${i}_${Math.random().toString(36).slice(2,8)}`;
+            });
+        } catch (e) {
+            games = [];
+        }
+        statTotal.textContent = games.length;
+        applyFilters();
+    }
+
+    function getFilteredGames() {
+        let list = games;
+        if (currentPlatform !== 'all') {
+            list = list.filter(g => g.platform === currentPlatform);
+        }
+        const q = searchInput.value.toLowerCase().trim();
+        if (q) {
+            list = list.filter(g => g.name.toLowerCase().includes(q));
+        }
+        return list;
+    }
+
+    function applyFilters() {
+        const list = getFilteredGames();
+        statNow.textContent = list.length;
+        displayGames(list);
+    }
+
+    function filterPlatform(platform) {
+        currentPlatform = platform;
+        document.querySelectorAll('.platform-tab').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.platform === platform);
+        });
+        applyFilters();
+    }
+
+    function displayGames(list) {
+        if (!list.length) {
+            gamesList.innerHTML = `<div class="empty-state"><div class="empty-state-icon">&#9678;</div><h3>No games</h3><p>No games found for this platform.</p></div>`;
+            gameCount.textContent = '0 games found';
+            return;
+        }
+        
+        const isAdmin = isAdminActive();
+        
+        gamesList.innerHTML = list.map((game) => `
+            <div class="game-card" data-id="${escapeHtml(game.id || '')}">
+                ${isAdmin ? `<button class="game-delete-btn" onclick="deleteGameById('${escapeHtml(game.id || '')}')" title="Delete game">×</button>` : ''}
+                ${renderGallery(game.screenshots, game.id || '')}
+                <div class="game-info">
+                    <div class="game-title">${escapeHtml(game.name)}</div>
+                    <div class="game-meta">${formatPlatform(game)} · ${formatSize(game.size)} · ${timeAgo(game.uploaded)}</div>
+                    <div class="game-desc">${escapeHtml(game.description || 'No description available.')}</div>
+                    <div class="game-actions">
+                        <a href="${escapeHtml(game.downloadUrl)}" target="_blank" rel="noopener noreferrer" class="btn btn-download">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13M6 11l6 6 6-6"/><path d="M3 20h18"/></svg>
+                            DOWNLOAD
+                        </a>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        
+        gameCount.textContent = `${list.length} game${list.length !== 1 ? 's' : ''} indexed`;
+        list.forEach((game) => initGallery(game.id || ''));
+    }
+
+    function formatPlatform(game) {
+        if (game.platform === 'emulator' && game.emulator) {
+            return `${game.emulator} (Emulator)`;
+        }
+        return game.platform ? game.platform.charAt(0).toUpperCase() + game.platform.slice(1) : 'PC';
+    }
+
+    function renderGallery(screenshots, gameId) {
+        const safeId = gameId.replace(/[^a-zA-Z0-9_-]/g, '_');
+        if (!screenshots || !screenshots.length) {
+            return `<div class="screenshot-gallery" style="display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:.7rem;">NO SCREENSHOTS</div>`;
+        }
+        
+        const slides = screenshots.map((url, si) => `
+            <div class="screenshot-slide" data-slide="${si}">
+                <img src="${escapeHtml(url)}" alt="Screenshot ${si+1}" loading="lazy" draggable="false">
+            </div>
+        `).join('');
+        
+        const dots = screenshots.map((_, si) => `
+            <div class="screenshot-dot ${si === 0 ? 'active' : ''}" data-dot="${si}" onclick="goToSlide('${safeId}', ${si})"></div>
+        `).join('');
+        
+        const counter = screenshots.length > 1 
+            ? `<div class="screenshot-counter" id="counter-${safeId}">1 / ${screenshots.length}</div>` 
+            : '';
+        
+        return `
+            <div class="screenshot-gallery" id="gallery-${safeId}">
+                <div class="screenshot-track" id="track-${safeId}">${slides}</div>
+                <div class="screenshot-dots">${dots}</div>
+                ${counter}
+                ${screenshots.length > 1 ? `
+                    <div class="screenshot-nav prev" onclick="prevSlide('${safeId}')">&#9664;</div>
+                    <div class="screenshot-nav next" onclick="nextSlide('${safeId}')">&#9654;</div>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    // ── GALLERY SWIPE ────────────────────────────────────────────────
+    const galleryState = {};
+
+    function initGallery(gameId) {
+        const safeId = gameId.replace(/[^a-zA-Z0-9_-]/g, '_');
+        const track = document.getElementById(`track-${safeId}`);
+        if (!track) return;
+        
+        galleryState[safeId] = { current: 0, touchStart: 0, touchEnd: 0 };
+        const gallery = document.getElementById(`gallery-${safeId}`);
+        const slides = gallery.querySelectorAll('.screenshot-slide');
+        galleryState[safeId].max = slides.length - 1;
+        
+        gallery.addEventListener('touchstart', e => {
+            galleryState[safeId].touchStart = e.changedTouches[0].screenX;
+        }, { passive: true });
+        
+        gallery.addEventListener('touchend', e => {
+            galleryState[safeId].touchEnd = e.changedTouches[0].screenX;
+            handleSwipe(safeId);
+        }, { passive: true });
+        
+        let isDragging = false, startX = 0;
+        gallery.addEventListener('mousedown', e => {
+            isDragging = true; startX = e.clientX;
+            track.style.cursor = 'grabbing';
+        });
+        gallery.addEventListener('mousemove', e => {
+            if (!isDragging) return;
+            e.preventDefault();
+        });
+        gallery.addEventListener('mouseup', e => {
+            if (!isDragging) return;
+            isDragging = false;
+            track.style.cursor = 'grab';
+            const diff = startX - e.clientX;
+            if (Math.abs(diff) > 50) {
+                diff > 0 ? nextSlide(safeId) : prevSlide(safeId);
+            }
+        });
+        gallery.addEventListener('mouseleave', () => {
+            isDragging = false;
+            track.style.cursor = 'grab';
+        });
+    }
+
+    function handleSwipe(safeId) {
+        const state = galleryState[safeId];
+        if (!state) return;
+        const diff = state.touchStart - state.touchEnd;
+        if (Math.abs(diff) > 50) {
+            diff > 0 ? nextSlide(safeId) : prevSlide(safeId);
+        }
+    }
+
+    function goToSlide(safeId, slideIndex) {
+        const state = galleryState[safeId];
+        if (!state) return;
+        state.current = Math.max(0, Math.min(slideIndex, state.max));
+        updateGallery(safeId);
+    }
+
+    function nextSlide(safeId) {
+        const state = galleryState[safeId];
+        if (!state || state.current >= state.max) return;
+        state.current++;
+        updateGallery(safeId);
+    }
+
+    function prevSlide(safeId) {
+        const state = galleryState[safeId];
+        if (!state || state.current <= 0) return;
+        state.current--;
+        updateGallery(safeId);
+    }
+
+    function updateGallery(safeId) {
+        const track = document.getElementById(`track-${safeId}`);
+        const dots = document.querySelectorAll(`#gallery-${safeId} .screenshot-dot`);
+        const counter = document.getElementById(`counter-${safeId}`);
+        if (!track) return;
+        
+        track.style.transform = `translateX(-${galleryState[safeId].current * 100}%)`;
+        dots.forEach((d, i) => d.classList.toggle('active', i === galleryState[safeId].current));
+        if (counter) counter.textContent = `${galleryState[safeId].current + 1} / ${galleryState[safeId].max + 1}`;
+    }
+
+    // ── DELETE GAME (FIXED: uses game ID, not array index) ───────────
+    async function deleteGameById(gameId) {
+        if (!isAdminActive()) { showToast('Admin mode required', 'error'); return; }
+        
+        const gameIndex = games.findIndex(g => g.id === gameId);
+        if (gameIndex === -1) { showToast('Game not found', 'error'); return; }
+        
+        const game = games[gameIndex];
+        if (!confirm(`Delete "${game.name}"? This cannot be undone.`)) return;
+        
+        const cfg = getConfig();
+        const token = localStorage.getItem('mkg_gh_token');
+        
+        try {
+            showToast('Deleting game...');
+            
+            // 1. Fetch current games.json (always fresh)
+            const res = await fetch(`https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${encodeURIComponent(cfg.gamesJson)}?ref=${cfg.branch}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/vnd.github+json'
+                }
+            });
+            if (!res.ok) throw new Error(`Failed to fetch games.json: ${res.status}`);
+            
+            const data = await res.json();
+            const sha = data.sha;
+            let currentGames = JSON.parse(atob(data.content.replace(/\s/g, '')));
+            
+            // 2. Find by ID again (array may have shifted since load)
+            const liveIndex = currentGames.findIndex(g => g.id === gameId);
+            if (liveIndex === -1) throw new Error('Game was already deleted');
+            
+            const deletedName = currentGames[liveIndex].name;
+            currentGames.splice(liveIndex, 1);
+            
+            // 3. Push updated games.json
+            const updateRes = await fetch(`https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${encodeURIComponent(cfg.gamesJson)}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/vnd.github+json',
+                    'Content-Type': 'application/json',
+                    'X-GitHub-Api-Version': '2022-11-28'
+                },
+                body: JSON.stringify({
+                    message: `Delete game: ${deletedName}`,
+                    content: btoa(unescape(encodeURIComponent(JSON.stringify(currentGames, null, 2)))),
+                    sha: sha,
+                    branch: cfg.branch
+                })
+            });
+            
+            if (!updateRes.ok) {
+                const err = await updateRes.json().catch(() => ({}));
+                throw new Error(`Failed to update games.json: ${updateRes.status} ${err.message || ''}`);
+            }
+            
+            showToast(`"${deletedName}" deleted`, 'success');
+            
+            // 4. Refresh from server (don't trust local state)
+            await loadGames();
+            
+        } catch (e) {
+            console.error('Delete error:', e);
+            showToast(e.message, 'error');
+        }
+    }
+
+    // ── SETTINGS / ADMIN MODE ────────────────────────────────────────
+    function openSettings() {
+        updateAdminUI();
+        document.getElementById('settingsOverlay').classList.add('open');
+    }
+
+    function closeSettings() {
+        document.getElementById('settingsOverlay').classList.remove('open');
+    }
+
+    function overlayClick(e) { if (e.target === e.currentTarget) closeSettings(); }
+
+    function isAdminActive() { return !!localStorage.getItem('mkg_gh_token'); }
+
+    function updateAdminUI() {
+        const active = isAdminActive();
+        const badge = document.getElementById('adminBadge');
+        badge.textContent = active ? 'Active' : 'Disabled';
+        badge.className = 'admin-badge ' + (active ? 'active' : 'disabled');
+        document.getElementById('adminStep0').style.display = active ? 'none' : '';
+        document.getElementById('adminStep1').style.display = 'none';
+        document.getElementById('adminStep2').style.display = 'none';
+        document.getElementById('adminStep3').style.display = active ? '' : 'none';
+        
+        if (active) {
+            postPanel.classList.add('active');
+            settingsToggle.textContent = '✕ CLOSE POST';
+            settingsToggle.onclick = togglePostPanel;
+        } else {
+            postPanel.classList.remove('active');
+            settingsToggle.textContent = '⚙ SETTINGS';
+            settingsToggle.onclick = openSettings;
+        }
+    }
+
+    function togglePostPanel() {
+        postPanel.classList.toggle('active');
+        settingsToggle.textContent = postPanel.classList.contains('active') ? '✕ CLOSE POST' : '⚙ SETTINGS';
+        settingsToggle.onclick = postPanel.classList.contains('active') ? togglePostPanel : openSettings;
+    }
+
+    function adminShowPass() {
+        document.getElementById('adminStep0').style.display = 'none';
+        document.getElementById('adminStep1').style.display = '';
+        document.getElementById('adminPassInput').value = '';
+        document.getElementById('adminPassErr').style.display = 'none';
+        setTimeout(() => document.getElementById('adminPassInput').focus(), 60);
+    }
+
+    function adminVerifyPass() {
+        const pass = document.getElementById('adminPassInput').value;
+        if (pass !== ADMIN_PASS) {
+            document.getElementById('adminPassErr').style.display = '';
+            document.getElementById('adminPassInput').value = '';
+            document.getElementById('adminPassInput').focus();
+            return;
+        }
+        document.getElementById('adminStep1').style.display = 'none';
+        document.getElementById('adminStep2').style.display = '';
+        setTimeout(() => document.getElementById('adminTokenInput').focus(), 60);
+    }
+
+    function adminSaveToken() {
+        const token = document.getElementById('adminTokenInput').value.trim();
+        if (!token) { showToast('Please enter a token', 'error'); return; }
+        localStorage.setItem('mkg_gh_token', token);
+        document.getElementById('adminTokenInput').value = '';
+        updateAdminUI();
+        loadGames();
+        showToast('✅ Admin mode enabled', 'success');
+    }
+
+    function adminDisable() {
+        if (!confirm('Disable admin mode? This clears the stored token.')) return;
+        localStorage.removeItem('mkg_gh_token');
+        updateAdminUI();
+        loadGames();
+        showToast('Admin mode disabled');
+    }
+
+    // ── PLATFORM SELECT IN POST ─────────────────────────────────────
+    function onPlatformChange() {
+        const platform = document.getElementById('postPlatform').value;
+        document.getElementById('emulatorField').style.display = platform === 'emulator' ? '' : 'none';
+    }
+
+    // ── POST GAME (FIXED: unique IDs, fresh SHA, sequential uploads) ─
+    function handleScreenshots(input) {
+        const files = Array.from(input.files);
+        if (adminScreenshots.length + files.length > 5) {
+            showToast('Max 5 screenshots allowed', 'error');
+            return;
+        }
+        files.forEach(file => {
+            if (!file.type.startsWith('image/')) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                adminScreenshots.push({ file, dataUrl: e.target.result });
+                renderScreenshotPreviews();
+            };
+            reader.readAsDataURL(file);
+        });
+        input.value = '';
+    }
+
+    function renderScreenshotPreviews() {
+        const container = document.getElementById('screenshotUpload');
+        container.innerHTML = adminScreenshots.map((s, i) => `
+            <div class="screenshot-preview">
+                <img src="${s.dataUrl}" alt="Preview">
+                <div class="remove" onclick="removeScreenshot(${i})">×</div>
+            </div>
+        `).join('') + `
+            <div class="screenshot-preview" onclick="document.getElementById('screenshotInput').click()">
+                <span>+</span>
+            </div>
+        `;
+    }
+
+    function removeScreenshot(index) {
+        adminScreenshots.splice(index, 1);
+        renderScreenshotPreviews();
+    }
+
+    async function postGame() {
+        const cfg = getConfig();
+        const token = localStorage.getItem('mkg_gh_token');
+        const name = document.getElementById('postName').value.trim();
+        const platform = document.getElementById('postPlatform').value;
+        const emulator = document.getElementById('postEmulator').value.trim();
+        const desc = document.getElementById('postDesc').value.trim();
+        const link = document.getElementById('postLink').value.trim();
+        const status = document.getElementById('postStatus');
+        const btn = document.getElementById('postBtn');
+        
+        if (!token) { showToast('Admin mode not enabled', 'error'); return; }
+        if (!name || !link) {
+            status.innerHTML = '<span style="color:var(--red)">Game name and download link are required</span>';
+            return;
+        }
+        if (platform === 'emulator' && !emulator) {
+            status.innerHTML = '<span style="color:var(--red)">Emulator name is required for Emulator platform</span>';
+            return;
+        }
+        if (adminScreenshots.length === 0) {
+            status.innerHTML = '<span style="color:var(--red)">At least 1 screenshot is required</span>';
+            return;
+        }
+        
+        btn.disabled = true;
+        status.innerHTML = '<span style="color:var(--cyan)">Uploading screenshots...</span>';
+        
+        try {
+            // Generate a unique ID for this game NOW (used for folder + JSON)
+            const gameId = `game_${Date.now()}_${Math.random().toString(36).slice(2,10)}`;
+            const safeName = name.replace(/[^a-z0-9]/gi, '-').toLowerCase().replace(/-+/g, '-').replace(/^-|-$/g, '');
+            const folderName = `${safeName}_${gameId.slice(-6)}`; // unique folder
+            
+            const screenshotUrls = [];
+            
+            // Upload screenshots SEQUENTIALLY to avoid race conditions
+            for (let i = 0; i < adminScreenshots.length; i++) {
+                const s = adminScreenshots[i];
+                const base64 = s.dataUrl.split(',')[1];
+                const path = `screenshots/${folderName}/${i}.png`;
+                
+                status.innerHTML = `<span style="color:var(--cyan)">Uploading screenshot ${i+1}/${adminScreenshots.length}...</span>`;
+                
+                const res = await fetch(`https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${encodeURIComponent(path)}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/vnd.github+json',
+                        'Content-Type': 'application/json',
+                        'X-GitHub-Api-Version': '2022-11-28'
+                    },
+                    body: JSON.stringify({
+                        message: `Add screenshot ${i+1} for ${name}`,
+                        content: base64,
+                        branch: cfg.branch
+                    })
+                });
+                
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(`Screenshot ${i+1} failed: ${res.status} ${err.message || res.statusText}`);
+                }
+                screenshotUrls.push(`https://raw.githubusercontent.com/${cfg.owner}/${cfg.repo}/${cfg.branch}/${path}`);
+            }
+            
+            status.innerHTML = '<span style="color:var(--cyan)">Updating games.json...</span>';
+            
+            // ALWAYS fetch fresh games.json + SHA right before commit
+            let currentGames = [];
+            let sha = null;
+            
+            const res = await fetch(`https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${encodeURIComponent(cfg.gamesJson)}?ref=${cfg.branch}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/vnd.github+json'
+                }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                sha = data.sha;
+                currentGames = JSON.parse(atob(data.content.replace(/\s/g, '')));
+                // Backfill IDs for old entries
+                currentGames.forEach((g, idx) => {
+                    if (!g.id) g.id = `game_${Date.now()}_${idx}_${Math.random().toString(36).slice(2,8)}`;
+                });
+            }
+            // If 404, games.json doesn't exist yet — sha stays null, currentGames stays []
+            
+            const gameEntry = {
+                id: gameId,                    // ← UNIQUE ID — prevents overwrites
+                name,
+                platform,
+                description: desc,
+                downloadUrl: link,
+                screenshots: screenshotUrls,
+                size: 0,
+                uploaded: new Date().toISOString()
+            };
+            if (platform === 'emulator') gameEntry.emulator = emulator;
+            
+            currentGames.unshift(gameEntry);
+            
+            const updateRes = await fetch(`https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${encodeURIComponent(cfg.gamesJson)}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/vnd.github+json',
+                    'Content-Type': 'application/json',
+                    'X-GitHub-Api-Version': '2022-11-28'
+                },
+                body: JSON.stringify({
+                    message: `Add game: ${name}`,
+                    content: btoa(unescape(encodeURIComponent(JSON.stringify(currentGames, null, 2)))),
+                    sha: sha,                  // ← FRESH SHA, prevents 409 conflict
+                    branch: cfg.branch
+                })
+            });
+            
+            if (!updateRes.ok) {
+                const err = await updateRes.json().catch(() => ({}));
+                throw new Error(`Failed to update games.json: ${updateRes.status} ${err.message || ''}`);
+            }
+            
+            status.innerHTML = '<span style="color:var(--green)">✓ Posted successfully! Reloading...</span>';
+            showToast('Game posted successfully!', 'success');
+            
+            // Clear form
+            document.getElementById('postName').value = '';
+            document.getElementById('postPlatform').value = 'android';
+            document.getElementById('postEmulator').value = '';
+            document.getElementById('postDesc').value = '';
+            document.getElementById('postLink').value = '';
+            adminScreenshots = [];
+            renderScreenshotPreviews();
+            onPlatformChange();
+            
+            // Wait for GitHub CDN cache, then reload
+            setTimeout(async () => {
+                status.innerHTML = '';
+                btn.disabled = false;
+                await loadGames();
+            }, 3000);
+            
+        } catch (e) {
+            console.error('Post error:', e);
+            status.innerHTML = `<span style="color:var(--red)">✗ ${escapeHtml(e.message)}</span>`;
+            btn.disabled = false;
+            showToast(e.message, 'error');
+        }
+    }
+
+    // ── UTILS ────────────────────────────────────────────────────────
+    function escapeHtml(t) {
+        const d = document.createElement('div');
+        d.textContent = t;
+        return d.innerHTML;
+    }
+
+    function formatSize(bytes) {
+        if (!bytes) return 'N/A';
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+        return (bytes/(1024*1024)).toFixed(1) + ' MB';
+    }
+
+    function timeAgo(dateStr) {
+        const date = new Date(dateStr);
+        const now = new Date();
+        const seconds = Math.floor((now - date) / 1000);
+        if (seconds < 60) return 'just now';
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return minutes + 'm ago';
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return hours + 'h ago';
+        const days = Math.floor(hours / 24);
+        if (days < 30) return days + 'd ago';
+        const months = Math.floor(days / 30);
+        if (months < 12) return months + 'mo ago';
+        return Math.floor(months / 12) + 'y ago';
+    }
+
+    function showToast(msg, type) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'toast' + (type ? ' ' + type : '');
+        t.classList.add('show');
+        clearTimeout(t._timer);
+        t._timer = setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    searchInput.addEventListener('input', () => applyFilters());
+
+    // ── INIT ─────────────────────────────────────────────────────────
+    loadGames();
+    updateAdminUI();
+    onPlatformChange();
+    </script>
+</body>
+</html>

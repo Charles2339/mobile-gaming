@@ -1,7 +1,21 @@
 [
   {
+    "id": "game_1782395213748_tu2elh70",
+    "name": "Watch Dogs 2",
+    "platform": "emulator",
+    "description": "In 2016, ctOS 2.0, an advanced operating system networking city infrastructure, was implemented in several US cities to create a safer, more efficient metropolis.\nPlay as Marcus Holloway, a brilliant young hacker living in the birthplace of the tech revolution, the San Francisco Bay Area. Team up with Dedsec, a notorious group of hackers, and expose the hidden dangers of ctOS 2.0, which, in the hands of corrupt corporations, is being wrongfully used to monitor and manipulate citizens on a massive scale.",
+    "downloadUrl": "https://www.mediafire.com/file/wl15n7ci935nl4a/GMinstall_4.11.rar/file",
+    "screenshots": [
+      "https://raw.githubusercontent.com/Charles2339/mobile-gaming/main/screenshots/watch-dogs-2_2elh70/0.png",
+      "https://raw.githubusercontent.com/Charles2339/mobile-gaming/main/screenshots/watch-dogs-2_2elh70/1.png"
+    ],
+    "size": 0,
+    "uploaded": "2026-06-25T13:46:58.476Z",
+    "emulator": "Winlator"
+  },
+  {
     "id": "game_1782394213012_zx9iuka2",
-    "name": "GTA SA (INDONESIA 🇮🇩 MODPACK)",
+    "name": "GTA SA (INDONESIA ð®ð© MODPACK)",
     "platform": "android",
     "description": "GTA SA with Indonesia modpack",
     "downloadUrl": "https://sfl.gl/CILh1laP",
@@ -13,7 +27,7 @@
   },
   {
     "id": "game_1782392099715_qn65hmz3",
-    "name": "GTA SA (BRAZIL ð§ð· MODPACK)",
+    "name": "GTA SA (BRAZIL Ã°ÂÂÂ§Ã°ÂÂÂ· MODPACK)",
     "platform": "android",
     "description": "GTA SA with Brazil Modpack v3",
     "downloadUrl": "https://4br.me/GTAMODIFICADObr",
@@ -25,7 +39,7 @@
   },
   {
     "id": "game_1782373801192_psdriw4v",
-    "name": "GTA SA (MZANSI ð¿ð¦ Modpack)",
+    "name": "GTA SA (MZANSI Ã°ÂÂÂ¿Ã°ÂÂÂ¦ Modpack)",
     "platform": "android",
     "description": "GTA SA with Mzansi Modpack v2. File Password: BYLAXXSIRR",
     "downloadUrl": "https://sharemods.com/yqpb4xg8opk5/GTA_MZANSI_MODPACK_V2_________.zip.html",
